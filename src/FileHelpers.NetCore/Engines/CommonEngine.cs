@@ -1,0 +1,677 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Reflection;
+using System.Text;
+using FileHelpers.Options;
+
+namespace FileHelpers
+{
+    /// <summary>
+    /// This class only has <b>static methods</b> to work with files and
+    /// strings (most of the common tools)
+    /// </summary>
+    public static class CommonEngine
+    {
+        // Nothing to instantiate
+
+        #region "  FileHelperEngine  "
+
+        /// <summary>
+        /// Used to read a file without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="recordClass">The record class.</param>
+        /// <param name="fileName">The file name</param>
+        /// <returns>The read records.</returns>
+        public static object[] ReadFile(Type recordClass, string fileName)
+        {
+            return ReadFile(recordClass, fileName, int.MaxValue);
+        }
+
+        /// <summary>
+        /// Used to read a file without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="recordClass">The record class.</param>
+        /// <param name="fileName">The file name</param>
+        /// <param name="maxRecords">The max number of records to read. Int32.MaxValue or -1 to read all records.</param>
+        /// <returns>The read records.</returns>
+        public static object[] ReadFile(Type recordClass, string fileName, int maxRecords)
+        {
+            var engine = new FileHelperEngine(recordClass);
+            return engine.ReadFile(fileName, maxRecords);
+        }
+
+        /// <summary>
+        /// Used to read a file as a DataTable without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="recordClass">The record class.</param>
+        /// <param name="fileName">The file name</param>
+        /// <returns>The DataTable representing all the read records.</returns>
+        public static DataTable ReadFileAsDT(Type recordClass, string fileName)
+        {
+            return ReadFileAsDT(recordClass, fileName, -1);
+        }
+
+        /// <summary>
+        /// Used to read a file as a DataTable without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="recordClass">The record class.</param>
+        /// <param name="fileName">The file name</param>
+        /// <param name="maxRecords">The max number of records to read. Int32.MaxValue or -1 to read all records.</param>
+        /// <returns>The DataTable representing all the read records.</returns>
+        public static DataTable ReadFileAsDT(Type recordClass, string fileName, int maxRecords)
+        {
+            var engine = new FileHelperEngine(recordClass);
+#pragma warning disable 618
+            return engine.ReadFileAsDT(fileName, maxRecords);
+#pragma warning restore 618
+        }
+
+        /// <summary>
+        /// Used to read a file without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="fileName">The file name</param>
+        /// <returns>The read records.</returns>
+        public static T[] ReadFile<T>(string fileName) where T : class
+        {
+            return ReadFile<T>(fileName, int.MaxValue);
+        }
+
+        /// <summary>
+        /// Used to read a file without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="fileName">The file name</param>
+        /// <param name="maxRecords">The max number of records to read. Int32.MaxValue or -1 to read all records.</param>
+        /// <returns>The read records.</returns>
+        public static T[] ReadFile<T>(string fileName, int maxRecords) where T : class
+        {
+            var engine = new FileHelperEngine<T>();
+            return engine.ReadFile(fileName, maxRecords);
+        }
+
+        /// <summary>
+        /// Used to read a string without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="recordClass">The record class.</param>
+        /// <param name="input">The input string.</param>
+        /// <returns>The read records.</returns>
+        public static object[] ReadString(Type recordClass, string input)
+        {
+            return ReadString(recordClass, input, -1);
+        }
+
+        /// <summary>
+        /// Used to read a string without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="recordClass">The record class.</param>
+        /// <param name="input">The input string.</param>
+        /// <param name="maxRecords">The max number of records to read. Int32.MaxValue or -1 to read all records.</param>
+        /// <returns>The read records.</returns>
+        public static object[] ReadString(Type recordClass, string input, int maxRecords)
+        {
+            var engine = new FileHelperEngine(recordClass);
+            return engine.ReadString(input, maxRecords);
+        }
+
+        /// <summary>
+        /// Used to read a string without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="input">The input string.</param>
+        /// <returns>The read records.</returns>
+        public static T[] ReadString<T>(string input) where T : class
+        {
+            var engine = new FileHelperEngine<T>();
+            return engine.ReadString(input);
+        }
+
+        /// <summary>
+        /// Used to write a file without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="fileName">The file name</param>
+        /// <param name="records">The records to write (Can be an array, List, etc)</param>
+        public static void WriteFile<T>(string fileName, IEnumerable<T> records) where T : class
+        {
+            var engine = new FileHelperEngine<T>();
+            engine.WriteFile(fileName, records);
+        }
+
+        /// <summary>
+        /// Used to write a string without instantiating the engine.<br />
+        /// <b>This method has limited features.  We recommend using the non static methods.</b>
+        /// </summary>
+        /// <param name="records">The records to write (Can be an array, List, etc)</param>
+        /// <returns>The string with the written records.</returns>
+        public static string WriteString<T>(IEnumerable<T> records) where T : class
+        {
+            var engine = new FileHelperEngine<T>();
+            return engine.WriteString(records);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// <b>Faster way</b> to Transform the records of type sourceType in
+        /// the sourceFile in records of type destType and write them to the
+        /// destFile.
+        /// </summary>
+        /// <param name="sourceFile">The file with records to be transformed</param>
+        /// <param name="destFile">The destination file with the transformed records</param>
+        /// <returns>The number of transformed records</returns>
+        public static int TransformFileFast<TSource, TDest>(string sourceFile, string destFile)
+            where TSource : class, ITransformable<TDest>
+            where TDest : class
+        {
+            var engine = new FileTransformEngine<TSource, TDest>();
+            return engine.TransformFileFast(sourceFile, destFile);
+        }
+
+        /// <summary>
+        /// Transform the records of type sourceType in the sourceFile in
+        /// records of type destType and write them to the destFile. (but
+        /// returns the transformed records) WARNING: this is a slower method
+        /// that the TransformFileAssync.
+        /// </summary>
+        /// <param name="sourceFile">The file with records to be transformed</param>
+        /// <param name="destFile">The destination file with the transformed records</param>
+        /// <returns>The transformed records.</returns>
+        public static object[] TransformFile<TSource, TDest>(string sourceFile, string destFile)
+            where TSource : class, ITransformable<TDest>
+            where TDest : class
+        {
+            var engine = new FileTransformEngine<TSource, TDest>();
+            return engine.TransformFile(sourceFile, destFile);
+        }
+
+        /// <summary>
+        /// Read the contents of a file and sort the records.
+        /// </summary>
+        /// <param name="recordClass">
+        /// Record Class (remember that need to implement the IComparer
+        /// interface, or you can use SortFileByfield)
+        /// </param>
+        /// <param name="fileName">The file to read.</param>
+        public static object[] ReadSortedFile(Type recordClass, string fileName)
+        {
+            if (typeof (IComparable).IsAssignableFrom(recordClass) == false) {
+                throw new BadUsageException(
+                    "The record class must implement the interface IComparable to use the Sort feature.");
+            }
+
+            var engine = new FileHelperEngine(recordClass);
+            object[] res = engine.ReadFile(fileName);
+
+            if (res.Length == 0)
+                return res;
+
+            Array.Sort(res);
+            return res;
+        }
+
+        /// <summary>
+        /// Sort the contents of the source file and write them to the destination file. 
+        /// </summary>
+        /// <param name="recordClass">
+        /// Record Class (remember that need to implement the IComparable
+        /// interface or use the SortFileByfield instead)
+        /// </param>
+        /// <param name="sourceFile">The source file.</param>
+        /// <param name="sortedFile">The destination File.</param>
+        public static void SortFile(Type recordClass, string sourceFile, string sortedFile)
+        {
+            if (typeof (IComparable).IsAssignableFrom(recordClass) == false) {
+                throw new BadUsageException(
+                    "The record class must implement the interface IComparable to use the Sort feature.");
+            }
+
+            var engine = new FileHelperEngine(recordClass);
+            object[] res = engine.ReadFile(sourceFile);
+
+            if (res.Length == 0)
+                engine.WriteFile(sortedFile, res);
+
+            Array.Sort(res);
+            engine.WriteFile(sortedFile, res);
+        }
+
+        /// <summary>
+        /// Sort the content of a File using the field name provided
+        /// </summary>
+        /// <param name="recordClass">The class for each record of the file.</param>
+        /// <param name="fieldName">The name of the field used to sort the file.</param>
+        /// <param name="asc">The sort direction.</param>
+        /// <param name="sourceFile">The source file.</param>
+        /// <param name="sortedFile">The destination File.</param>
+        public static void SortFileByField(Type recordClass,
+            string fieldName,
+            bool asc,
+            string sourceFile,
+            string sortedFile)
+        {
+            var engine = new FileHelperEngine(recordClass);
+            FieldInfo fi = engine.RecordInfo.GetFieldInfo(fieldName);
+
+            if (fi == null)
+                throw new BadUsageException("The record class not contains the field " + fieldName);
+
+            object[] res = engine.ReadFile(sourceFile);
+
+            IComparer comparer = new FieldComparer(fi, asc);
+            Array.Sort(res, comparer);
+
+            engine.WriteFile(sortedFile, res);
+        }
+
+        /// <summary>
+        /// Sort the Record Array using the field name provided. (for
+        /// advanced sorting use SortRecords)
+        /// </summary>
+        /// <param name="fieldName">The field name.</param>
+        /// <param name="records">The records Array.</param>
+        public static void SortRecordsByField(object[] records, string fieldName)
+        {
+            SortRecordsByField(records, fieldName, true);
+        }
+
+        /// <summary>
+        /// Sort the Record Array using the field name provided. (for
+        /// advanced sorting use SortRecords)
+        /// </summary>
+        /// <param name="fieldName">The field name.</param>
+        /// <param name="records">The records Array.</param>
+        /// <param name="ascending">The direction of the sort. True means Ascending.</param>
+        public static void SortRecordsByField(object[] records, string fieldName, bool ascending)
+        {
+            if (records.Length > 0 &&
+                records[0] != null) {
+                var engine = new FileHelperEngine(records[0].GetType());
+                FieldInfo fi = engine.RecordInfo.GetFieldInfo(fieldName);
+
+                if (fi == null)
+                    throw new BadUsageException("The record class not contains the field " + fieldName);
+
+                IComparer comparer = new FieldComparer(fi, ascending);
+
+                Array.Sort(records, comparer);
+            }
+        }
+
+        /// <summary>
+        /// Sort the Record Array. The records must be of a Type that
+        /// implements the IComparable interface.
+        /// </summary>
+        /// <param name="records">The records Array.</param>
+        public static void SortRecords(object[] records)
+        {
+            if (records.Length > 0 &&
+                records[0] != null) {
+                Type recordClass = records[0].GetType();
+
+                if (typeof (IComparable).IsAssignableFrom(recordClass) == false) {
+                    throw new BadUsageException(
+                        "The record class must implement the interface IComparable to use the Sort feature.");
+                }
+
+                Array.Sort(records);
+            }
+        }
+
+        #region "  FieldComparer  "
+
+        /// <summary>
+        /// Compare one field to another
+        /// </summary>
+        private class FieldComparer : IComparer
+        {
+            private readonly FieldInfo mFieldInfo;
+            private readonly int mAscending;
+
+            public FieldComparer(FieldInfo fi, bool asc)
+            {
+                mFieldInfo = fi;
+                mAscending = asc
+                    ? 1
+                    : -1;
+                if (typeof (IComparable).IsAssignableFrom(mFieldInfo.FieldType) == false) {
+                    throw new BadUsageException("The field " + mFieldInfo.Name +
+                                                " needs to implement the interface IComparable");
+                }
+            }
+
+            /// <summary>
+            /// Compare object 1 to object 2
+            /// </summary>
+            /// <param name="x">First object to test</param>
+            /// <param name="y">Second object to test</param>
+            /// <returns>0 if equal, -1 if x &lt; y, 1 otherwise</returns>
+            public int Compare(object x, object y)
+            {
+                var xv = mFieldInfo.GetValue(x) as IComparable;
+                return xv.CompareTo(mFieldInfo.GetValue(y)) * mAscending;
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Converts any collection of records to a DataTable using reflection.
+        /// WARNING: this methods returns null if the number of records is 0,
+        /// pass the Type of the records to get an empty DataTable.
+        /// </summary>
+        /// <param name="records">The records to be converted to a DataTable</param>
+        /// <returns>The DataTable containing the records as DataRows</returns>
+        public static DataTable RecordsToDataTable(ICollection records)
+        {
+            return RecordsToDataTable(records, -1);
+        }
+
+        /// <summary>
+        /// Converts any collection of records to a DataTable using reflection.
+        /// WARNING: this methods returns null if the number of records is 0,
+        /// pass the Type of the records to get an empty DataTable.
+        /// </summary>
+        /// <param name="records">The records to be converted to a DataTable</param>
+        /// <param name="maxRecords">The max number of records to add to the DataTable. -1 for all.</param>
+        /// <returns>The DataTable containing the records as DataRows</returns>
+        public static DataTable RecordsToDataTable(ICollection records, int maxRecords)
+        {
+            IRecordInfo ri = null;
+            foreach (var obj in records) {
+                if (obj != null) {
+                    ri = RecordInfo.Resolve(obj.GetType());
+                    break;
+                }
+            }
+
+            if (ri == null)
+                return new DataTable();
+
+            return ri.Operations.RecordsToDataTable(records, maxRecords);
+        }
+
+        /// <summary>
+        /// Converts any collection of records to a DataTable using reflection.
+        /// If the number of records is 0 this methods returns an empty
+        /// DataTable with the columns based on the fields of the
+        /// Type.
+        /// </summary>
+        /// <param name="records">The records to be converted to a DataTable</param>
+        /// <returns>The DataTable containing the records as DataRows</returns>
+        /// <param name="recordType">The type of the inner records.</param>
+        public static DataTable RecordsToDataTable(ICollection records, Type recordType)
+        {
+            return RecordsToDataTable(records, recordType, -1);
+        }
+
+        /// <summary>
+        /// Converts any collection of records to a DataTable using reflection.
+        /// If the number of records is 0 this methods returns an empty
+        /// DataTable with the columns based on the fields of the
+        /// Type.
+        /// </summary>
+        /// <param name="records">The records to be converted to a DataTable</param>
+        /// <returns>The DataTable containing the records as DataRows</returns>
+        /// <param name="maxRecords">The max number of records to add to the DataTable. -1 for all.</param>
+        /// <param name="recordType">The type of the inner records.</param>
+        public static DataTable RecordsToDataTable(ICollection records, Type recordType, int maxRecords)
+        {
+            IRecordInfo ri = RecordInfo.Resolve(recordType);
+            return ri.Operations.RecordsToDataTable(records, maxRecords);
+        }
+
+        /// <summary>
+        /// Reads the file1 and file2 using the recordType and write it to
+        /// destinationFile
+        /// </summary>
+        public static void MergeFiles(Type recordType, string file1, string file2, string destinationFile)
+        {
+            using (var engineRead = new FileHelperAsyncEngine(recordType))
+            using (var engineWrite = new FileHelperAsyncEngine(recordType)) {
+                engineWrite.BeginWriteFile(destinationFile);
+
+                object[] readRecords;
+
+                // Read FILE 1
+                engineRead.BeginReadFile(file1);
+
+                readRecords = engineRead.ReadNexts(50);
+                while (readRecords.Length > 0) {
+                    engineWrite.WriteNexts(readRecords);
+                    readRecords = engineRead.ReadNexts(50);
+                }
+                engineRead.Close();
+
+                // Read FILE 2
+                engineRead.BeginReadFile(file2);
+
+                readRecords = engineRead.ReadNexts(50);
+                while (readRecords.Length > 0) {
+                    engineWrite.WriteNexts(readRecords);
+                    readRecords = engineRead.ReadNexts(50);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Merge the contents of 2 files and write them sorted to a destination file.
+        /// </summary>
+        /// <param name="recordType">The record Type.</param>
+        /// <param name="file1">File with contents to be merged.</param>
+        /// <param name="file2">File with contents to be merged.</param>
+        /// <param name="field">The name of the field used to sort the records.</param>
+        /// <param name="destFile">The destination file.</param>
+        /// <returns>The merged and sorted records.</returns>
+        public static object[] MergeAndSortFile(Type recordType,
+            string file1,
+            string file2,
+            string destFile,
+            string field)
+        {
+            return MergeAndSortFile(recordType, file1, file2, destFile, field, true);
+        }
+
+        /// <summary>
+        /// Merge the contents of 2 files and write them sorted to a destination file.
+        /// </summary>
+        /// <param name="recordType">The record Type.</param>
+        /// <param name="file1">File with contents to be merged.</param>
+        /// <param name="file2">File with contents to be merged.</param>
+        /// <param name="field">The name of the field used to sort the records.</param>
+        /// <param name="ascending">Indicate the order of sort.</param>
+        /// <param name="destFile">The destination file.</param>
+        /// <returns>The merged and sorted records.</returns>
+        public static object[] MergeAndSortFile(Type recordType,
+            string file1,
+            string file2,
+            string destFile,
+            string field,
+            bool ascending)
+        {
+            var engine = new FileHelperEngine(recordType);
+
+#pragma warning disable 618
+            var list = engine.ReadFileAsList(file1);
+            list.AddRange(engine.ReadFileAsList(file2));
+#pragma warning restore 618
+
+            var res = list.ToArray();
+            list = null; // <- better performance (memory)
+
+            SortRecordsByField(res, field, ascending);
+
+            engine.WriteFile(destFile, res);
+
+            return res;
+        }
+
+        /// <summary>
+        /// Merge the contents of 2 files and write them sorted to a
+        /// destination file.
+        /// </summary>
+        /// <param name="recordType">The record Type.</param>
+        /// <param name="file1">File with contents to be merged.</param>
+        /// <param name="file2">File with contents to be merged.</param>
+        /// <param name="destFile">The destination file.</param>
+        /// <returns>The merged and sorted records.</returns>
+        public static object[] MergeAndSortFile(Type recordType, string file1, string file2, string destFile)
+        {
+            var engine = new FileHelperEngine(recordType);
+
+#pragma warning disable 618
+            var list = engine.ReadFileAsList(file1);
+            list.AddRange(engine.ReadFileAsList(file2));
+#pragma warning restore 618
+
+            var res = list.ToArray();
+            list = null; // <- better performance (memory)
+
+            SortRecords(res);
+
+            engine.WriteFile(destFile, res);
+            return res;
+        }
+
+        
+
+        #region "  RemoveDuplicateRecords  "
+
+        /// <summary>
+        /// This method allow to remove the duplicated records from an array.
+        /// </summary>
+        /// <param name="arr">The array with the records to be checked.</param>
+        /// <returns>An array with the result of remove the duplicate records from the source array.</returns>
+        public static T[] RemoveDuplicateRecords<T>(T[] arr) where T : IComparable<T>
+        {
+            if (arr == null ||
+                arr.Length <= 1)
+                return arr;
+
+            var nodup = new List<T>();
+
+            for (int i = 0; i < arr.Length; i++) {
+                bool isUnique = true;
+
+                for (int j = i + 1; j < arr.Length; j++) {
+                    if (arr[i].CompareTo(arr[j]) == 0) {
+                        isUnique = false;
+                        break;
+                    }
+                }
+
+                if (isUnique)
+                    nodup.Add(arr[i]);
+            }
+
+            return nodup.ToArray();
+        }
+
+        #endregion
+
+        #region "  ReadCSV  "
+
+        /// <summary>
+        /// A fast way to read record by record a CSV file delimited by ','.
+        /// The fields can be quoted.
+        /// </summary>
+        /// <param name="filename">The CSV file to read</param>
+        /// <returns>An enumeration of <see cref="RecordIndexer"/></returns>
+        public static IEnumerable<RecordIndexer> ReadCsv(string filename)
+        {
+            return ReadCsv(filename, ',');
+        }
+
+        /// <summary>
+        /// A fast way to read record by record a CSV file with a custom
+        /// delimiter. The fields can be quoted.
+        /// </summary>
+        /// <param name="filename">The CSV file to read</param>
+        /// <param name="delimiter">The field delimiter.</param>
+        /// <returns>An enumeration of <see cref="RecordIndexer"/></returns>
+        public static IEnumerable<RecordIndexer> ReadCsv(string filename, char delimiter)
+        {
+            return ReadCsv(filename, delimiter, 0);
+        }
+
+        /// <summary>
+        /// A fast way to read record by record a CSV file with a custom
+        /// delimiter. The fields can be quoted.
+        /// </summary>
+        /// <param name="filename">The CSV file to read</param>
+        /// <param name="delimiter">The field delimiter.</param>
+        /// <param name="headerLines">The number of header lines in the CSV file</param>
+        /// <returns>An enumeration of <see cref="RecordIndexer"/></returns>
+        public static IEnumerable<RecordIndexer> ReadCsv(string filename, char delimiter, int headerLines)
+        {
+            return ReadCsv(filename, delimiter, headerLines, Encoding.GetEncoding(0));
+        }
+
+        /// <summary>
+        /// A fast way to read record by record a CSV file with a custom
+        /// delimiter. The fields can be quoted.
+        /// </summary>
+        /// <param name="filename">The CSV file to read</param>
+        /// <param name="delimiter">The field delimiter.</param>
+        /// <param name="encoding">The file <see cref="Encoding"/></param>
+        /// <returns>An enumeration of <see cref="RecordIndexer"/></returns>
+        public static IEnumerable<RecordIndexer> ReadCsv(string filename, char delimiter, Encoding encoding)
+        {
+            return ReadCsv(filename, delimiter, 0, encoding);
+        }
+
+        /// <summary>
+        /// A fast way to read record by record a CSV file with a custom
+        /// delimiter. The fields can be quoted.
+        /// </summary>
+        /// <param name="filename">The CSV file to read</param>
+        /// <param name="delimiter">The field delimiter.</param>
+        /// <param name="encoding">The file <see cref="Encoding"/></param>
+        /// <param name="headerLines">The number of header lines in the CSV file</param>
+        /// <returns>An enumeration of <see cref="RecordIndexer"/></returns>
+        public static IEnumerable<RecordIndexer> ReadCsv(string filename,
+            char delimiter,
+            int headerLines,
+            Encoding encoding)
+        {
+            var engine = new FileHelperAsyncEngine<RecordIndexer>(encoding);
+            ((DelimitedRecordOptions) engine.Options).Delimiter = delimiter.ToString();
+            engine.Options.IgnoreFirstLines = headerLines;
+            engine.BeginReadFile(filename);
+
+            return engine;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// A fast way to sort a big file. For more options you need to
+        /// instantiate the BigFileSorter class instead of using static methods
+        /// </summary>
+        public static void SortBigFile<T>(string source, string destination)
+            where T: class, IComparable<T>
+        {
+            var sorter = new BigFileSorter<T>();
+            sorter.Sort(source, destination);
+        }
+
+        /// <summary>
+        /// A fast way to sort a big file. For more options you need to
+        /// instantiate the BigFileSorter class instead of using static methods
+        /// </summary>
+        public static void SortBigFile<T>(Encoding encoding, string source, string destination)
+            where T : class, IComparable<T>
+        {
+            var sorter = new BigFileSorter<T>(encoding);
+            sorter.Sort(source, destination);
+        }
+    }
+}
