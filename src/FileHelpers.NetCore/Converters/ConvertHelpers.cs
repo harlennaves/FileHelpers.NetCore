@@ -26,7 +26,7 @@ namespace FileHelpers
         private static CultureInfo CreateCulture(string decimalSep)
         {
             var ci = new CultureInfo(CultureInfo.CurrentCulture.LCID);
-
+            
             if (decimalSep == ".") {
                 ci.NumberFormat.NumberDecimalSeparator = ".";
                 ci.NumberFormat.NumberGroupSeparator = ",";

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/harlennaves/FileHelpers.NetCore</PackageProjectUrl>
+    <Description>Fluent fixed layout file engine processing</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FileHelpers.NetCore.Core\FileHelpers.Fluent.csproj" />
+  </ItemGroup>
+
+</Project>
