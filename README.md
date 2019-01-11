@@ -1,8 +1,25 @@
 ﻿# FileHelpers Fluent
+Is a free .NET Core (2.2) library to import or export data from fixed length in strings.
+All configuration can be made using a Builder to describe a record.
+
+This project is based on [FileHelpers](https://www.filehelpers.net/) project.
+
+
+## Roadmap
+
+ - [x] Fixed Layout Engine 
+ - [ ] Basic type converters - (January 12, 2019)
+ - [ ] Read from files - (January 12, 2019)
+ - [ ] Write from files - (January 12, 2019)
+ - [ ] Fixed Layout Engine - Multiple Record Types - (February 19, 2019)
+ - [ ] Delimited layout Engine - (February 16, 2019)
+ - [ ] Delimited layout Engine - Multiple Record Types - (February 23, 2019)
+ - [ ] Fixed layout Engine - Master Detail - (March 30, 2019)
+ - [ ] Delimited layout Engine - Master Detail - (March 30, 2019)
 
 # Fixed Engine
 
-# Read string to object
+## Read string to object
 The code bellow will configure an FixedRecordDescriptor with 3 fields and transform a fixed string into an array of ExpandoObject's containing the following properties.
 
  - Name of string type
@@ -29,7 +46,7 @@ The code bellow will configure an FixedRecordDescriptor with 3 fields and transf
 
             var items = engine.ReadString("Harlen Naves                                      0000587065966319840330");
 
-# Read an object with array representation
+## Read an object with array representation
 Will configure a FixedRecordDescriptor with 3 properties (Funtion, ArraySize and ArrayData). 
 ArrayData field will represents an Array of objects described with a single property (DealId).
 
@@ -65,7 +82,7 @@ ArrayData field will represents an Array of objects described with a single prop
 
 *All 0's will be ignored as an array item because the Align of field "ArrayData" is setted to true and AlignChar is '0'. If you want to consider all array positions just set Align of "ArrayData" as false.*
 
-# Write to string
+## Write to string
 The code bellow configures an FixedRecordDescriptor with 3 properties (Name, Doc and BirthDate) and Write all objects into an string. 
 Every array position will be transformed into a single line.
     
@@ -94,7 +111,7 @@ Every array position will be transformed into a single line.
 
             string line = engine.WriteString(new[] { item });
 
-# Write a string with an object that contains an array property
+## Write a string with an object that contains an array property
 Will configure a FixedRecordDescriptor with 3 properties (Funtion, ArraySize and ArrayData). 
 ArrayData field will represents an Array of objects described with a single property (DealId).
 
