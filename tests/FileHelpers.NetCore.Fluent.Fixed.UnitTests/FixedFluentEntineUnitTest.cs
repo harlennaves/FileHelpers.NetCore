@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 
-using FileHelpers.NetCore.Core.Converters;
-using FileHelpers.NetCore.Fluent.Exceptions;
-using FileHelpers.NetCore.Fluent.Fixed.Descriptors;
-using FileHelpers.NetCore.Fluent.Fixed.Extensions;
+using FileHelpers.Core.Converters;
+using FileHelpers.Fluent;
+using FileHelpers.Fluent.Exceptions;
+using FileHelpers.Fluent.Fixed;
+using FileHelpers.Fluent.Fixed.Descriptors;
+using FileHelpers.Fluent.Fixed.Extensions;
+using FileHelpers.Fluent.Fixed.Json;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -58,6 +61,7 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
                         .SetAlignChar('0');
 
             var engine = new FluentFixedEngine(descriptor);
+
         }
 
         [TestMethod]
@@ -367,6 +371,88 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
                            .SetAlignChar('0');
 
             FluentFixedEngine engine = descriptor.Build();
+
+            ExpandoObject item = new ExpandoObject();
+            item.TryAdd("Function", "001");
+            item.TryAdd("ArraySize", 25);
+
+            List<ExpandoObject> arrayData = new List<ExpandoObject>();
+            for (int i = 0; i < 25; i++)
+            {
+                ExpandoObject arrayItem = new ExpandoObject();
+                arrayItem.TryAdd("DealId", "STOCKASC" + i.ToString().PadLeft(2, '0'));
+                arrayData.Add(arrayItem);
+            }
+
+            item.TryAdd("ArrayData", arrayData);
+
+            string content = engine.WriteString(new[] { item });
+
+            Assert.AreEqual("0010025STOCKASC00STOCKASC01STOCKASC02STOCKASC03STOCKASC04STOCKASC05STOCKASC06STOCKASC07STOCKASC08STOCKASC09STOCKASC10STOCKASC11STOCKASC12STOCKASC13STOCKASC14STOCKASC15STOCKASC16STOCKASC17STOCKASC18STOCKASC19STOCKASC20STOCKASC21STOCKASC22STOCKASC23STOCKASC24" + Environment.NewLine, content);
+        }
+
+        [TestMethod]
+        public void Serialize_Descriptor()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Function")
+                      .SetLength(3)
+                      .SetAlignMode(AlignMode.Right)
+                      .SetAlignChar('0');
+
+            descriptor.AddField("ArraySize")
+                      .SetLength(4)
+                      .SetAlignMode(AlignMode.Left)
+                      .SetAlignChar('0')
+                      .SetConverter(typeof(IntegerConverter));
+
+            var arrayDescriptor = descriptor.AddArray("ArrayData")
+                                            .SetArrayLength(500)
+                                            .SetArrayItemLength(10)
+                                            .SetAlign(false);
+
+            arrayDescriptor.AddField("DealId")
+                           .SetLength(10)
+                           .SetNullValue(string.Empty)
+                           .SetAlignMode(AlignMode.Right)
+                           .SetAlignChar('0');
+
+            var jsonDescriptor = descriptor.Build().Serialize();
+        }
+
+        [TestMethod]
+        public void Deserialize_Descriptor()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Function")
+                      .SetLength(3)
+                      .SetAlignMode(AlignMode.Right)
+                      .SetAlignChar('0');
+
+            descriptor.AddField("ArraySize")
+                      .SetLength(4)
+                      .SetAlignMode(AlignMode.Left)
+                      .SetAlignChar('0')
+                      .SetConverter(typeof(IntegerConverter));
+
+            var arrayDescriptor = descriptor.AddArray("ArrayData")
+                                            .SetArrayLength(500)
+                                            .SetArrayItemLength(10)
+                                            .SetAlign(false);
+
+            arrayDescriptor.AddField("DealId")
+                           .SetLength(10)
+                           .SetNullValue(string.Empty)
+                           .SetAlignMode(AlignMode.Right)
+                           .SetAlignChar('0');
+
+            var engineToSerialize = descriptor.Build();
+
+            var jsonDescriptor = engineToSerialize.Serialize();
+
+            var engine = FluentFixedEngine.Build(jsonDescriptor);
 
             ExpandoObject item = new ExpandoObject();
             item.TryAdd("Function", "001");

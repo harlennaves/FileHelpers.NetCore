@@ -58,6 +58,8 @@ namespace FileHelpers.Core.Engines
 
         public abstract Task<ExpandoObject[]> ReadStreamAsync(TextReader reader);
 
+        public abstract string Serialize();
+
         /// <summary>
         /// Called in read operations just before the record string is
         /// translated to a record.

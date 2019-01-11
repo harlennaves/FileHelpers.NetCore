@@ -12,11 +12,16 @@ using FileHelpers.Fluent.Events;
 using FileHelpers.Fluent.Exceptions;
 using FileHelpers.Fluent.Fixed.Descriptors;
 using FileHelpers.Fluent.Fixed.Extensions;
+using FileHelpers.Fluent.Fixed.Json;
 
 namespace FileHelpers.Fluent.Fixed
 {
     public class FluentFixedEngine : FluentEngineBase
     {
+        public static FluentFixedEngine Build(string json) =>
+            JsonFixedRecordDescriptorBuilder.Build(json);
+        
+
         public FluentFixedEngine(IRecordDescriptor descriptor) : base(descriptor)
         {
         }
@@ -174,5 +179,8 @@ namespace FileHelpers.Fluent.Fixed
 
             return items.ToArray();
         }
+
+        public override string Serialize() =>
+            JsonFixedRecordDescriptorBuilder.Serialize((FixedRecordDescriptor)Descriptor);
     }
 }

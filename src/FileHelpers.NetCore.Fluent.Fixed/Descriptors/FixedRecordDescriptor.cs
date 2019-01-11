@@ -6,9 +6,9 @@ namespace FileHelpers.Fluent.Fixed.Descriptors
 {
     public class FixedRecordDescriptor : RecordDescriptor
     {
-        FixedMode FixedMode { get; }
+        public FixedMode FixedMode { get; set; }
 
-        bool IgnoreEmptyLines { get; }
+        public bool IgnoreEmptyLines { get; set; }
 
         public FixedRecordDescriptor()
         {
