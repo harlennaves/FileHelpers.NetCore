@@ -4,13 +4,16 @@ All configuration can be made using a Builder to describe a record.
 
 This project is based on [FileHelpers](https://www.filehelpers.net/) project.
 
+## NuGet packages
+https://www.nuget.org/packages/FileHelpers.Fluent/1.0.0
+https://www.nuget.org/packages/FileHelpers.Fluent.Fixed/1.0.0
 
 ## Roadmap
 
  - [x] Fixed Layout Engine 
- - [ ] Basic type converters - (January 12, 2019)
- - [ ] Read from files - (January 12, 2019)
- - [ ] Write from files - (January 12, 2019)
+ - [x] Basic type converters - ~~(January 12, 2019)~~
+ - [x] Read from files - ~~(January 12, 2019)~~
+ - [x] Write from files - ~~(January 12, 2019)~~
  - [ ] Fixed Layout Engine - Multiple Record Types - (February 19, 2019)
  - [ ] Delimited layout Engine - (February 16, 2019)
  - [ ] Delimited layout Engine - Multiple Record Types - (February 23, 2019)
