@@ -17,5 +17,7 @@ namespace FileHelpers.Core.Descriptors
         string ConverterFormat { get; set; }
 
         TrimMode TrimMode { get; set; }
+
+        Type Type { get; set; }
     }
 }

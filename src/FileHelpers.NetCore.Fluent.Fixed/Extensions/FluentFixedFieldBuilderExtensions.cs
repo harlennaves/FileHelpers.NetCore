@@ -34,13 +34,17 @@ namespace FileHelpers.Fluent.Fixed.Extensions
             if (string.Empty.Equals(stringValue) && recordInfo.Converter == null)
                 return stringValue;
 
-            if (recordInfo.Converter == null)
+            if (recordInfo.Converter == null && recordInfo.Type == null)
                 return stringValue;
 
             ConverterBase converterInstance =
-                ConverterFactory.GetConverter(recordInfo.Converter, recordInfo.ConverterFormat);
+                recordInfo.Converter == null
+                ? ConverterFactory.GetDefaultConverter(recordInfo.Type)
+                : ConverterFactory.GetConverter(recordInfo.Converter, recordInfo.ConverterFormat);
 
-            return converterInstance?.StringToField(stringValue);
+            return converterInstance == null 
+                ? stringValue 
+                : converterInstance.StringToField(stringValue);
         }
 
         private static string CreateFieldString(this IFixedFieldInfoDescriptor fieldBuilder, object fieldValue)

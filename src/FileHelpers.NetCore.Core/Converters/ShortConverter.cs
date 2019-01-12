@@ -9,7 +9,7 @@ namespace FileHelpers.Core.Converters
         public override object StringToField(string @from)
         {
             if (!short.TryParse(from, NumberStyles.Any, CultureInfo.InvariantCulture, out short to))
-                throw new ConvertException(from, typeof(long));
+                throw new ConvertException(from, typeof(short));
             return (to);
         }
     }

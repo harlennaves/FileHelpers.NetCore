@@ -52,6 +52,14 @@ namespace FileHelpers.Core.Engines
 
         public abstract Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records);
 
+        public abstract void WriteFile(string fileName, IEnumerable<ExpandoObject> records);
+
+        public abstract Task WriteFileAsync(string fileName, IEnumerable<ExpandoObject> records);
+
+        public abstract ExpandoObject[] ReadFile(string fileName);
+
+        public abstract Task<ExpandoObject[]> ReadFileAsync(string fileName);
+
         public abstract ExpandoObject[] ReadString(string source);
 
         public abstract ExpandoObject[] ReadStream(TextReader reader);

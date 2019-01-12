@@ -62,6 +62,8 @@ namespace FileHelpers.Fluent.Fixed.Json
                 fieldBuilder.SetConverterFormat((string)fieldInfoValue.ConverterFormat.Value);
             if (fieldInfoValue.TrimMode != null)
                 fieldBuilder.SetTrimMode((TrimMode)fieldInfoValue.TrimMode.Value);
+            if (fieldInfoValue.Type != null)
+                fieldBuilder.SetType(Type.GetType(fieldInfoValue.Type.Value));
         }
 
         private static void CreateArray(IRecordDescriptor descriptor, dynamic fieldInfo)

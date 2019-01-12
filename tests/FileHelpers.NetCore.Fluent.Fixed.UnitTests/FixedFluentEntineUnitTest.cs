@@ -399,6 +399,7 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
             descriptor.AddField("Function")
                       .SetLength(3)
                       .SetAlignMode(AlignMode.Right)
+                      .SetType(typeof(int))
                       .SetAlignChar('0');
 
             descriptor.AddField("ArraySize")

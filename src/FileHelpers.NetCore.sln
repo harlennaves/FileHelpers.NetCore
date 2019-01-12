@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileHelpers.NetCore", "FileHelpers.NetCore\FileHelpers.NetCore.csproj", "{A840D753-243F-49C8-A856-E676942A2DA6}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A141EC1D-0045-498C-8BFC-AC6F8D5A5481}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileHelpers.Fluent", "FileHelpers.NetCore.Core\FileHelpers.Fluent.csproj", "{4FC64AF5-2B03-4C6D-BF71-44D94BC4625C}"
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A840D753-243F-49C8-A856-E676942A2DA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A840D753-243F-49C8-A856-E676942A2DA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A840D753-243F-49C8-A856-E676942A2DA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A840D753-243F-49C8-A856-E676942A2DA6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4FC64AF5-2B03-4C6D-BF71-44D94BC4625C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4FC64AF5-2B03-4C6D-BF71-44D94BC4625C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FC64AF5-2B03-4C6D-BF71-44D94BC4625C}.Release|Any CPU.ActiveCfg = Release|Any CPU

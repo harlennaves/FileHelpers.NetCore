@@ -23,6 +23,7 @@ namespace FileHelpers.Fluent.Builders
         public char AlignChar { get; set; }
         public string ConverterFormat { get; set; }
         public TrimMode TrimMode { get; set; }
+        public Type Type { get; set; }
 
         public FieldInfoBuilder SetConverter(Type converter)
         {
@@ -62,6 +63,31 @@ namespace FileHelpers.Fluent.Builders
         public FieldInfoBuilder SetTrimMode(TrimMode trimMode)
         {
             TrimMode = trimMode;
+            return this;
+        }
+
+        public FieldInfoBuilder SetType(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (type != typeof(bool)
+                && type != typeof(byte)
+                && type != typeof(DateTime)
+                && type != typeof(decimal)
+                && type != typeof(double)
+                && type != typeof(float)
+                && type != typeof(int)
+                && type != typeof(long)
+                && type != typeof(short)
+                && type != typeof(uint)
+                && type != typeof(ulong)
+                && type != typeof(ushort)
+                && type != typeof(sbyte)
+                )
+                throw new BadFluentConfigurationException("The type type must be one of bult-in types or an System.DateTime");
+
+            Type = type;
             return this;
         }
     }

@@ -117,8 +117,29 @@ namespace FileHelpers.Fluent.Fixed
                 AfterFluentWriteEventArgs afterWriteArgs = OnAfterWriteRecord(expandoObject, lineNumber, sb.ToString());
 
                 await writer.WriteLineAsync(afterWriteArgs.Line);
+                await writer.FlushAsync();
                 lineNumber++;
             }
+        }
+
+        public override void WriteFile(string fileName, IEnumerable<ExpandoObject> records) =>
+            WriteFileAsync(fileName, records).GetAwaiter().GetResult();
+
+        public override async Task WriteFileAsync(string fileName, IEnumerable<ExpandoObject> records)
+        {
+            using (var writer = new StreamWriter(fileName))
+            {
+                await WriteStreamAsync(writer, records);
+            }
+        }
+
+        public override ExpandoObject[] ReadFile(string fileName) =>
+            ReadFileAsync(fileName).GetAwaiter().GetResult();
+
+        public override async Task<ExpandoObject[]> ReadFileAsync(string fileName)
+        {
+            using (var reader = new StreamReader(fileName))
+                return await ReadStreamAsync(reader);
         }
 
         public override ExpandoObject[] ReadString(string source)
