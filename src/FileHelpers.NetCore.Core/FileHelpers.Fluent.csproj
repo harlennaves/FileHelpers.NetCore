@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/harlennaves/FileHelpers.NetCore</PackageProjectUrl>
+    <Version>1.1.0</Version>
+    <Authors>Harlen Naves</Authors>
   </PropertyGroup>
 
   <ItemGroup>

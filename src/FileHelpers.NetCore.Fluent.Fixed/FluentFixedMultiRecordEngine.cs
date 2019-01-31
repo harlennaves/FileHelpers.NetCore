@@ -4,30 +4,36 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using FileHelpers.Core.Descriptors;
 using FileHelpers.Core.Engines;
 using FileHelpers.Fluent.Events;
 using FileHelpers.Fluent.Exceptions;
+using FileHelpers.Fluent.Fixed.Core;
 using FileHelpers.Fluent.Fixed.Descriptors;
 using FileHelpers.Fluent.Fixed.Extensions;
-using FileHelpers.Fluent.Fixed.Json;
 
 namespace FileHelpers.Fluent.Fixed
 {
-    public class FluentFixedEngine : FluentEngineBase
+    public class FluentFixedMultiRecordEngine : FluentEventEngineBase
     {
-        public static FluentFixedEngine Build(string json) =>
-            JsonFixedRecordDescriptorBuilder.Build(json);
-        
+        private readonly IList<MultiRecordItem> recordTypes;
+        private readonly string recordTypeProperty;
 
-        public FluentFixedEngine(IRecordDescriptor descriptor) : base(descriptor)
+        public FluentFixedMultiRecordEngine(string recordTypeProperty, params MultiRecordItem[] recordTypes)
+        :this(new List<MultiRecordItem>(recordTypes))
         {
+            this.recordTypeProperty = recordTypeProperty;
         }
 
-        public FluentFixedEngine(IRecordDescriptor descriptor, Encoding encoding) : base(descriptor, encoding)
+        private FluentFixedMultiRecordEngine(IList<MultiRecordItem> recordTypes)
         {
+            foreach (MultiRecordItem multiRecordItem in recordTypes)
+                CheckDescriptor(multiRecordItem.Descriptor);
+            
+            this.recordTypes = recordTypes;
         }
 
         protected override void CheckFieldDescriptor(string fieldName, IFieldInfoTypeDescriptor fieldDescriptor)
@@ -98,10 +104,15 @@ namespace FileHelpers.Fluent.Fixed
                     lineNumber++;
                     continue;
                 }
+                if (!record.ContainsKey(recordTypeProperty))
+                    throw new BadFluentConfigurationException($"The record must contais a property called '{recordTypeProperty}'");
+
+                MultiRecordItem recordItem = GetLineDescriptor((string)record[recordTypeProperty]);
                 var sb = new StringBuilder();
+                
                 foreach (KeyValuePair<string, object> keyValuePair in record)
                 {
-                    if (!Descriptor.Fields.TryGetValue(keyValuePair.Key, out IFieldInfoTypeDescriptor fieldDescriptor))
+                    if (!recordItem.Descriptor.Fields.TryGetValue(keyValuePair.Key, out IFieldInfoTypeDescriptor fieldDescriptor))
                         throw new Exception($"The field {keyValuePair.Key} is not configured");
 
                     if (fieldDescriptor.IsArray)
@@ -113,7 +124,6 @@ namespace FileHelpers.Fluent.Fixed
 
                     sb.Append(((IFixedFieldInfoDescriptor)fieldDescriptor).RecordToString(keyValuePair.Value));
                 }
-
                 AfterFluentWriteEventArgs afterWriteArgs = OnAfterWriteRecord(expandoObject, lineNumber, sb.ToString());
 
                 await writer.WriteLineAsync(afterWriteArgs.Line);
@@ -128,9 +138,7 @@ namespace FileHelpers.Fluent.Fixed
         public override async Task WriteFileAsync(string fileName, IEnumerable<ExpandoObject> records)
         {
             using (var writer = new StreamWriter(fileName))
-            {
                 await WriteStreamAsync(writer, records);
-            }
         }
 
         public override ExpandoObject[] ReadFile(string fileName) =>
@@ -148,18 +156,48 @@ namespace FileHelpers.Fluent.Fixed
                 source = string.Empty;
 
             using (var reader = new StringReader(source))
-            {
                 return ReadStream(reader);
-            }
         }
 
-        public override ExpandoObject[] ReadStream(TextReader reader) =>
+        public  override ExpandoObject[] ReadStream(TextReader reader) =>
             ReadStreamAsync(reader).GetAwaiter().GetResult();
 
+        public override async Task<ExpandoObject[]> ReadStreamAsync(TextReader reader)
+        {
+            IList<ExpandoObject> items = new List<ExpandoObject>();
+            string currentLine = await reader.ReadLineAsync();
+            int currentLineNumber = 1;
+            while (currentLine != null)
+            {
+                if (!string.IsNullOrWhiteSpace(currentLine))
+                {
+                    BeforeFluentReadEventArgs beforeReadArgs = OnBeforeReadRecord(currentLine, currentLineNumber);
+                    if (!beforeReadArgs.SkipRecord)
+                    {
+                        if (beforeReadArgs.LineChanged)
+                            currentLine = beforeReadArgs.Line;
+                        MultiRecordItem recordItem = GetLineDescriptor(currentLine);
+                        if (recordItem != null)
+                        {
+                            ExpandoObject item = await ReadLineAsync(currentLine, recordItem.Descriptor);
+                            
+                            AfterFluentReadEventArgs afterReadArgs = OnAfterReadRecord(currentLine, currentLineNumber, item);
+
+                            items.Add(afterReadArgs.Record);
+                        }
+                    }
+                }
+
+                currentLineNumber++;
+                currentLine = await reader.ReadLineAsync();
+            }
+
+            return items.ToArray();
+        }
 
         protected override async Task<ExpandoObject> ReadLineAsync(string currentLine, IRecordDescriptor descriptor)
         {
-            return await Task.Run((() =>
+            return await Task.Run(() =>
             {
                 var item = new ExpandoObject();
 
@@ -179,40 +217,19 @@ namespace FileHelpers.Fluent.Fixed
                 }
 
                 return item;
-            }));
+            });
         }
 
-        public override async Task<ExpandoObject[]> ReadStreamAsync(TextReader reader)
+        private MultiRecordItem GetLineDescriptor(string currentLine)
         {
-            IList<ExpandoObject> items = new List<ExpandoObject>();
-
-            string currentLine = await reader.ReadLineAsync();
-            int currentLineNumber = 1;
-            while (currentLine != null)
+            foreach (MultiRecordItem multiRecordItem in recordTypes)
             {
-                if (!string.IsNullOrWhiteSpace(currentLine))
-                {
-                    BeforeFluentReadEventArgs beforeReadArgs = OnBeforeReadRecord(currentLine, currentLineNumber);
-                    if (!beforeReadArgs.SkipRecord)
-                    {
-                        if (beforeReadArgs.LineChanged)
-                            currentLine = beforeReadArgs.Line;
-
-                        ExpandoObject item = await ReadLineAsync(currentLine, Descriptor);
-                        
-                        AfterFluentReadEventArgs afterReadArgs = OnAfterReadRecord(currentLine, currentLineNumber, item);
-
-                        items.Add(afterReadArgs.Record);
-                    }
-                }
-                currentLineNumber++;
-                currentLine = await reader.ReadLineAsync();
+                if (Regex.IsMatch(currentLine, multiRecordItem.RegexPattern))
+                    return multiRecordItem;
             }
 
-            return items.ToArray();
+            return null;
         }
 
-        public override string Serialize() =>
-            JsonFixedRecordDescriptorBuilder.Serialize((FixedRecordDescriptor)Descriptor);
     }
 }

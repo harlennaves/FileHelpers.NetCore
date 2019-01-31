@@ -5,6 +5,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/harlennaves/FileHelpers.NetCore</PackageProjectUrl>
     <Description>Fluent fixed layout file engine processing</Description>
+    <Version>1.1.0</Version>
+    <Authors>Harlen Naves</Authors>
   </PropertyGroup>
 
   <ItemGroup>
