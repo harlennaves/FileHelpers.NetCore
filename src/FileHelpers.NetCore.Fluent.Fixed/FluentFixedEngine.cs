@@ -146,14 +146,16 @@ namespace FileHelpers.Fluent.Fixed
         {
             if (source == null)
                 source = string.Empty;
-
-            using (var reader = new StringReader(source))
+            using (var stream = new MemoryStream(Encoding.GetBytes(source)))
             {
-                return ReadStream(reader);
+                using (var streamReader = new StreamReader(stream))
+                {
+                    return ReadStream(streamReader);
+                }
             }
         }
 
-        public override ExpandoObject[] ReadStream(TextReader reader) =>
+        public override ExpandoObject[] ReadStream(StreamReader reader) =>
             ReadStreamAsync(reader).GetAwaiter().GetResult();
 
 
@@ -182,7 +184,7 @@ namespace FileHelpers.Fluent.Fixed
             }));
         }
 
-        public override async Task<ExpandoObject[]> ReadStreamAsync(TextReader reader)
+        public override async Task<ExpandoObject[]> ReadStreamAsync(StreamReader reader)
         {
             IList<ExpandoObject> items = new List<ExpandoObject>();
 

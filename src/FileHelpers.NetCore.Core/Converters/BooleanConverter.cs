@@ -16,6 +16,7 @@
                 case "v":
                 case "y":
                 case "t":
+                case "s":
                     return true;
                 default:
                     return false;

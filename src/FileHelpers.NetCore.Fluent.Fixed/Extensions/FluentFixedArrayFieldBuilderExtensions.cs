@@ -51,7 +51,7 @@ namespace FileHelpers.Fluent.Fixed.Extensions
                 return new dynamic[0];
 
             IList<dynamic> items = new List<dynamic>();
-            string arrayString = line.Substring(offset, recordInfo.ArrayLength);
+            string arrayString = line.Substring(offset, line.Length >= recordInfo.ArrayLength ? recordInfo.ArrayLength : line.Length - offset);
             offset += recordInfo.ArrayLength;
             int arrayOffset = 0;
 

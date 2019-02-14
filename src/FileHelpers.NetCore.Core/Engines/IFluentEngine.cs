@@ -17,9 +17,9 @@ namespace FileHelpers.Core.Engines
 
         ExpandoObject[] ReadString(string source);
 
-        ExpandoObject[] ReadStream(TextReader reader);
+        ExpandoObject[] ReadStream(StreamReader reader);
 
-        Task<ExpandoObject[]> ReadStreamAsync(TextReader reader);
+        Task<ExpandoObject[]> ReadStreamAsync(StreamReader reader);
 
         /// <summary>
         /// Called in read operations just before the record string is

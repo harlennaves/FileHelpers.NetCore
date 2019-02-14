@@ -2,6 +2,7 @@
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 using FileHelpers.Core.Descriptors;
@@ -12,6 +13,8 @@ namespace FileHelpers.Core.Engines
 {
     public abstract class FluentEventEngineBase : IFluentEngine
     {
+        public Encoding Encoding { get; set; }
+
         public abstract string WriteString(IEnumerable<ExpandoObject> records);
 
         public abstract void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records);
@@ -28,9 +31,9 @@ namespace FileHelpers.Core.Engines
 
         public abstract ExpandoObject[] ReadString(string source);
 
-        public abstract ExpandoObject[] ReadStream(TextReader reader);
+        public abstract ExpandoObject[] ReadStream(StreamReader reader);
 
-        public abstract Task<ExpandoObject[]> ReadStreamAsync(TextReader reader);
+        public abstract Task<ExpandoObject[]> ReadStreamAsync(StreamReader reader);
 
         protected abstract Task<ExpandoObject> ReadLineAsync(string currentLine, IRecordDescriptor descriptor);
 

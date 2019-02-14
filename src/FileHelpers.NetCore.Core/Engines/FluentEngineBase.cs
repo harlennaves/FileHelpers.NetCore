@@ -13,8 +13,7 @@ namespace FileHelpers.Core.Engines
     {
         public IRecordDescriptor Descriptor { get; }
 
-        public Encoding Encoding { get; }
-
+        
         protected FluentEngineBase(IRecordDescriptor descriptor)
             : this(descriptor, Encoding.UTF8)
         {

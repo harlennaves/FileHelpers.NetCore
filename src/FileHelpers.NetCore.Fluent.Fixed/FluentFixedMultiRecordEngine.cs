@@ -22,10 +22,18 @@ namespace FileHelpers.Fluent.Fixed
         private readonly IList<MultiRecordItem> recordTypes;
         private readonly string recordTypeProperty;
 
-        public FluentFixedMultiRecordEngine(string recordTypeProperty, params MultiRecordItem[] recordTypes)
-        :this(new List<MultiRecordItem>(recordTypes))
+
+        public FluentFixedMultiRecordEngine(string recordTypeProperty, Encoding encoding, params MultiRecordItem[] recordTypes)
+            : this(new List<MultiRecordItem>(recordTypes))
         {
             this.recordTypeProperty = recordTypeProperty;
+            Encoding = encoding;
+        }
+
+        public FluentFixedMultiRecordEngine(string recordTypeProperty, params MultiRecordItem[] recordTypes)
+        :this(recordTypeProperty, Encoding.UTF8, recordTypes)
+        {
+            
         }
 
         private FluentFixedMultiRecordEngine(IList<MultiRecordItem> recordTypes)
@@ -155,14 +163,19 @@ namespace FileHelpers.Fluent.Fixed
             if (source == null)
                 source = string.Empty;
 
-            using (var reader = new StringReader(source))
-                return ReadStream(reader);
+            using (var stream = new MemoryStream(Encoding.GetBytes(source)))
+            {
+                using (var streamReader = new StreamReader(stream))
+                {
+                    return ReadStream(streamReader);
+                }
+            }
         }
 
-        public  override ExpandoObject[] ReadStream(TextReader reader) =>
+        public  override ExpandoObject[] ReadStream(StreamReader reader) =>
             ReadStreamAsync(reader).GetAwaiter().GetResult();
 
-        public override async Task<ExpandoObject[]> ReadStreamAsync(TextReader reader)
+        public override async Task<ExpandoObject[]> ReadStreamAsync(StreamReader reader)
         {
             IList<ExpandoObject> items = new List<ExpandoObject>();
             string currentLine = await reader.ReadLineAsync();

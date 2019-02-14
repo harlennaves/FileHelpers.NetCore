@@ -20,11 +20,14 @@ namespace FileHelpers.Fluent.Fixed.Extensions
 
         public static object StringToRecord(this IFixedFieldInfoDescriptor recordInfo, string line, ref int offset)
         {
-            if (line.Length < recordInfo.Length + offset)
+            if (offset >= line.Length)
                 return null;
+            int length = recordInfo.Length;
+            if (line.Length < recordInfo.Length + offset)
+                length = line.Length - offset;
 
-            var stringValue = line.Substring(offset, recordInfo.Length);
-            offset += recordInfo.Length;
+            var stringValue = line.Substring(offset, length);
+            offset += length;
 
             if (stringValue == null)
                 return null;
