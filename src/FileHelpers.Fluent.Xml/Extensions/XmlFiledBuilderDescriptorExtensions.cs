@@ -33,6 +33,31 @@ namespace FileHelpers.Fluent.Xml.Extensions
             return fieldDescriptor.ParseElement(name, element);
         }
 
+        public static void RecordToXml(this IXmlFieldInfoDescriptor fieldDescriptor, string propertyName, XElement parent, object record)
+        {
+            if (fieldDescriptor.IsAttribute)
+            {
+                parent.SetAttributeValue(propertyName, fieldDescriptor.CreateFieldString(record));
+                return;
+            }
+            parent.SetElementValue(propertyName, fieldDescriptor.CreateFieldString(record));
+        }
+
+        private static string CreateFieldString(this IXmlFieldInfoDescriptor fieldDescriptor, object fieldValue)
+        {
+            if (fieldDescriptor.Converter == null)
+            {
+                if (fieldValue == null)
+                    return string.Empty;
+                return fieldValue.ToString();
+            }
+
+            ConverterBase converterInstance =
+                ConverterFactory.GetConverter(fieldDescriptor.Converter, fieldDescriptor.ConverterFormat);
+
+            return converterInstance?.FieldToString(fieldValue) ?? string.Empty;
+        }
+
         private static object ParseAttribute(this IXmlFieldInfoDescriptor fieldDescriptor, string attributeName, XElement element)
         {
             XAttribute attribute = element.Attribute(attributeName);

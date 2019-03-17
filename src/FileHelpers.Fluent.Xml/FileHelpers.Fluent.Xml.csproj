@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Harlen Naves</Authors>
+    <Company>Harlen Naves</Company>
+    <Description>Fluent XML Layout</Description>
+    <PackageProjectUrl>https://github.com/harlennaves/FileHelpers.NetCore</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿using FileHelpers.Core.Descriptors;
 using FileHelpers.Core.Engines;
+using FileHelpers.Fluent.Exceptions;
 using FileHelpers.Fluent.Xml.Descriptors;
 using FileHelpers.Fluent.Xml.Extensions;
 using System;
@@ -10,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace FileHelpers.Fluent.Xml
@@ -43,7 +43,20 @@ namespace FileHelpers.Fluent.Xml
             var cancellationToken = new CancellationTokenSource();
             var xmlDocument = await XDocument.LoadAsync(reader, LoadOptions.None, cancellationToken.Token);
 
-            foreach (XElement element in xmlDocument.Elements())
+            IEnumerable<XElement> elements = null;
+
+            string rootElementName = ((XmlRecordDescriptor)Descriptor).RootElementName;
+            if (string.IsNullOrWhiteSpace(rootElementName))
+                elements = xmlDocument.Elements();
+            else
+            {
+                var firstElement = xmlDocument.Elements().FirstOrDefault();
+                elements = (firstElement == null || firstElement.Name.LocalName != rootElementName)
+                    ? xmlDocument.Elements()
+                    : firstElement.Elements();
+            }
+
+            foreach (XElement element in elements)
             {
                 items.Add(ReadElement(element, Descriptor));
             }
@@ -68,13 +81,22 @@ namespace FileHelpers.Fluent.Xml
 
             foreach (KeyValuePair<string, IFieldInfoTypeDescriptor> fieldInfoTypeDescriptor in descriptor.Fields)
             {
+                string propertyName = string.IsNullOrWhiteSpace(((IXmlFieldPropertyNameInfoDescriptor)fieldInfoTypeDescriptor.Value).PropertyName)
+                            ? fieldInfoTypeDescriptor.Key
+                            : ((IXmlFieldPropertyNameInfoDescriptor)fieldInfoTypeDescriptor.Value).PropertyName;
+                
                 if (fieldInfoTypeDescriptor.Value.IsArray)
                 {
+                    item.TryAdd(propertyName,
+                    ((IXmlArrayFieldInfoDescriptor)fieldInfoTypeDescriptor.Value).ToRecordArray(
+                            fieldInfoTypeDescriptor.Key,
+                            element
+                        ));
                     continue;
                 }
-                var fieldInfoDescriptor = (IXmlFieldInfoDescriptor)fieldInfoTypeDescriptor.Value;
-                item.TryAdd(string.IsNullOrWhiteSpace(fieldInfoDescriptor.PropertyName) ? fieldInfoTypeDescriptor.Key : fieldInfoDescriptor.PropertyName,
-                    ((IXmlFieldInfoDescriptor)fieldInfoTypeDescriptor.Value).ToRecord(fieldInfoTypeDescriptor.Key, element)
+
+                item.TryAdd(propertyName,
+                        ((IXmlFieldInfoDescriptor)fieldInfoTypeDescriptor.Value).ToRecord(fieldInfoTypeDescriptor.Key, element)
                     );
             }
 
@@ -86,29 +108,72 @@ namespace FileHelpers.Fluent.Xml
             throw new NotImplementedException();
         }
 
-        public override void WriteFile(string fileName, IEnumerable<ExpandoObject> records)
+        public override void WriteFile(string fileName, IEnumerable<ExpandoObject> records) => 
+            WriteFileAsync(fileName, records).GetAwaiter().GetResult();
+
+        public override async Task WriteFileAsync(string fileName, IEnumerable<ExpandoObject> records)
         {
-            throw new NotImplementedException();
+            using(var writer = new StreamWriter(fileName))
+                await WriteStreamAsync(writer, records);
         }
 
-        public override Task WriteFileAsync(string fileName, IEnumerable<ExpandoObject> records)
-        {
-            throw new NotImplementedException();
-        }
+        public override void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records) =>
+            WriteStreamAsync(writer, records).GetAwaiter().GetResult();
 
-        public override void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records)
+        public override async Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records)
         {
-            throw new NotImplementedException();
-        }
+            var xmlDescriptor = ((XmlRecordDescriptor)Descriptor);
+            string rootElementName = xmlDescriptor.RootElementName;
+            string elementName = xmlDescriptor.ElementName;
 
-        public override Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records)
-        {
-            throw new NotImplementedException();
+            if (records.Count() > 1 && rootElementName == elementName)
+                throw new BadFluentConfigurationException("There are more than one record without root element. It is impossible to create a valid XML.");
+
+            XDocument xmlDocument = new XDocument();
+            
+            XElement rootElement = new XElement(rootElementName);
+            xmlDocument.Add(rootElement);
+            foreach (ExpandoObject record in records)
+            {
+                XElement element;
+                if (rootElementName == elementName)
+                    element = rootElement;
+                else
+                {
+                    element = new XElement(elementName);
+                    rootElement.Add(element);
+                }
+                foreach(KeyValuePair<string, object> keyValuePair in record)
+                {
+                    string propertyName = keyValuePair.Key;
+                    if (!Descriptor.Fields.TryGetValue(keyValuePair.Key, out IFieldInfoTypeDescriptor fieldDescriptor))
+                    {
+                        fieldDescriptor = Descriptor.Fields.Values.FirstOrDefault(x => ((IXmlFieldPropertyNameInfoDescriptor)x).PropertyName == keyValuePair.Key);
+                        if (fieldDescriptor == null)
+                            throw new Exception($"The field {keyValuePair.Key} is not configured"); 
+                    }
+                    
+                    if (fieldDescriptor.IsArray)
+                    {
+                        ((IXmlArrayFieldInfoDescriptor)fieldDescriptor).ArrayToXml(propertyName, element, (IEnumerable<dynamic>)keyValuePair.Value);
+                        continue;
+                    }
+                    ((IXmlFieldInfoDescriptor)fieldDescriptor).RecordToXml(propertyName, element, keyValuePair.Value);
+                }
+
+            }
+
+            await xmlDocument.SaveAsync(writer, SaveOptions.DisableFormatting, new CancellationToken());
         }
 
         public override string WriteString(IEnumerable<ExpandoObject> records)
         {
-            throw new NotImplementedException();
+            var sb = new StringBuilder();
+            using (var writer = new StringWriter(sb))
+            {
+                WriteStream(writer, records);
+                return sb.ToString();
+            }
         }
 
         protected override void CheckFieldDescriptor(string fieldName, IFieldInfoTypeDescriptor fieldDescriptor)
@@ -119,73 +184,6 @@ namespace FileHelpers.Fluent.Xml
         protected override Task<ExpandoObject> ReadLineAsync(string currentLine, IRecordDescriptor descriptor)
         {
             throw new NotImplementedException();
-        }
-
-        private void Parse(dynamic parent, XElement node)
-        {
-            try
-            {
-                if (node.HasElements)
-                {
-                    if (node.Elements(node.Elements().First().Name.LocalName).Count() > 1)
-                    {
-                        //list
-                        var item = new ExpandoObject();
-                        var list = new List<dynamic>();
-                        foreach (var element in node.Elements())
-                        {
-                            Parse(list, element);
-                        }
-
-                        AddProperty(item, node.Elements().First().Name.LocalName, list);
-                        AddProperty(parent, node.Name.ToString(), item);
-                    }
-                    else
-                    {
-                        var item = new ExpandoObject();
-
-                        foreach (var attribute in node.Attributes())
-                        {
-                            AddProperty(item, attribute.Name.ToString(), attribute.Value.Trim());
-                        }
-
-                        //element
-                        foreach (var element in node.Elements())
-                        {
-                            Parse(item, element);
-                        }
-
-                        AddProperty(parent, node.Name.ToString(), item);
-                    }
-                }
-                else
-                {
-                    AddProperty(parent, node.Name.ToString(), node.Value.Trim());
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        private void AddProperty(dynamic parent, string name, object value)
-        {
-            try
-            {
-                if (parent is List<dynamic>)
-                {
-                    (parent as List<dynamic>).Add(value);
-                }
-                else
-                {
-                    (parent as IDictionary<string, object>)[name] = value;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
         }
     }
 }

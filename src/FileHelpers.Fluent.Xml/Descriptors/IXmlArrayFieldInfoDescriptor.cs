@@ -5,8 +5,7 @@ using System.Text;
 
 namespace FileHelpers.Fluent.Xml.Descriptors
 {
-    public interface IXmlFieldInfoDescriptor : IFieldInfoDescriptor, IXmlFieldPropertyNameInfoDescriptor
+    public interface IXmlArrayFieldInfoDescriptor : IXmlRecordDescriptor, IFieldInfoTypeDescriptor, IXmlFieldPropertyNameInfoDescriptor, IRecordDescriptor
     {
-        bool IsAttribute { get; set; }
     }
 }

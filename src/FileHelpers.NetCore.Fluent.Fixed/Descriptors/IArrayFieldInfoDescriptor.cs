@@ -1,6 +1,6 @@
 ﻿namespace FileHelpers.Core.Descriptors
 {
-    public interface IArrayFieldInfoDescriptor : IFieldInfoTypeDescriptor, IRecordDescriptor
+    public interface IArrayFieldInfoDescriptor : IFieldInfoTypeDescriptor, IXmlFieldPropertyNameInfoDescriptor, IRecordDescriptor
     {
         int ArrayLength { get; set; }
 
