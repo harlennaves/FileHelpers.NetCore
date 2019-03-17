@@ -1,13 +1,15 @@
 ﻿# FileHelpers Fluent
-Is a free .NET Core (2.2) library to import or export data from fixed length in strings.
+Is a free .NET Core (2.2) library to import or export data from fixed length, xml in strings.
 All configuration can be made using a Builder to describe a record.
 
 This project is based on [FileHelpers](https://www.filehelpers.net/) project.
 
 ## NuGet packages
-https://www.nuget.org/packages/FileHelpers.Fluent/1.0.0
+https://www.nuget.org/packages/FileHelpers.Fluent/1.2.1.2
 
-https://www.nuget.org/packages/FileHelpers.Fluent.Fixed/1.0.0
+https://www.nuget.org/packages/FileHelpers.Fluent.Fixed/1.2.1.2
+
+https://www.nuget.org/packages/FileHelpers.Fluent.Xml/1.0.0
 
 ## Roadmap
 
@@ -15,11 +17,12 @@ https://www.nuget.org/packages/FileHelpers.Fluent.Fixed/1.0.0
  - [x] Basic type converters - ~~(January 12, 2019)~~
  - [x] Read from files - ~~(January 12, 2019)~~
  - [x] Write from files - ~~(January 12, 2019)~~
- - [ ] Fixed Layout Engine - Multiple Record Types - (February 19, 2019)
- - [ ] Delimited layout Engine - (February 16, 2019)
- - [ ] Delimited layout Engine - Multiple Record Types - (February 23, 2019)
- - [ ] Fixed layout Engine - Master Detail - (March 30, 2019)
- - [ ] Delimited layout Engine - Master Detail - (March 30, 2019)
+ - [x] Fixed Layout Engine - Multiple Record Types - ~~(February 19, 2019)~~
+ - [ ] Delimited layout Engine - (**Delayed** to April 16, 2019)
+ - [ ] Delimited layout Engine - Multiple Record Types - (**Delayed** to April 23, 2019)
+ - [ ] Fixed layout Engine - Master Detail - (**Delayed** to April 30, 2019)
+ - [ ] Delimited layout Engine - Master Detail - (**Delayed** to April 30, 2019)
+ - [x] Xml layout Engine - ~~(March 17, 2019)~~
 
 # Fixed Engine
 
