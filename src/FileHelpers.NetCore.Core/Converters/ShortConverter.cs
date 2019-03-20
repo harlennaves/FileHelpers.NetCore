@@ -8,8 +8,7 @@ namespace FileHelpers.Core.Converters
     {
         public override object StringToField(string @from)
         {
-            if (!short.TryParse(from, NumberStyles.Any, CultureInfo.InvariantCulture, out short to))
-                throw new ConvertException(from, typeof(short));
+            short.TryParse(from, NumberStyles.Any, CultureInfo.InvariantCulture, out short to);
             return (to);
         }
     }

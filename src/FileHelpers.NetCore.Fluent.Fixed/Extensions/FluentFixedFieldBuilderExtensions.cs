@@ -28,19 +28,38 @@ namespace FileHelpers.Fluent.Fixed.Extensions
 
             var stringValue = line.Substring(offset, length);
             offset += length;
-
-            if (stringValue == null)
+            
+            if (stringValue == null && recordInfo.NullValue == null)
                 return null;
+            else if (stringValue == null && recordInfo.NullValue != null)
+                stringValue = recordInfo.NullValue.ToString();
 
             stringValue = recordInfo.StringTrim(stringValue);
-
+            ConverterBase converterInstance = null;
             if (string.Empty.Equals(stringValue) && recordInfo.Converter == null)
-                return stringValue;
+            {
+                if (recordInfo.NullValue != null)
+                    stringValue = recordInfo.NullValue.ToString();
+                if (string.Empty.Equals(stringValue) && recordInfo.Converter == null)
+                {
+                    if (recordInfo.Type != null)
+                    {
+                        converterInstance = ConverterFactory.GetDefaultConverter(recordInfo.Type);
+                        return converterInstance == null
+                            ? stringValue
+                            : converterInstance.StringToField(stringValue);
+                    }
+                    return stringValue;
+                }
+            }
 
             if (recordInfo.Converter == null && recordInfo.Type == null)
                 return stringValue;
 
-            ConverterBase converterInstance =
+            if (string.IsNullOrWhiteSpace(stringValue) && recordInfo.NullValue != null)
+                stringValue = recordInfo.NullValue.ToString();
+
+            converterInstance =
                 recordInfo.Converter == null
                 ? ConverterFactory.GetDefaultConverter(recordInfo.Type)
                 : ConverterFactory.GetConverter(recordInfo.Converter, recordInfo.ConverterFormat);

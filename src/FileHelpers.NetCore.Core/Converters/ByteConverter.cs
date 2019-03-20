@@ -11,8 +11,7 @@ namespace FileHelpers.Core.Converters
         {
             if (string.IsNullOrWhiteSpace(from))
                 return null;
-            if (!byte.TryParse(from.RemoveBlanks(), NumberStyles.Number, CultureInfo.InvariantCulture, out byte res))
-                throw new ConvertException(from, typeof(byte));
+            byte.TryParse(from.RemoveBlanks(), NumberStyles.Number, CultureInfo.InvariantCulture, out byte res);
             return res;
         }
     }

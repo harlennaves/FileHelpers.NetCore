@@ -10,8 +10,8 @@ namespace FileHelpers.Core.Converters
 
         public override object StringToField(string from)
         {
-            if (!int.TryParse(from, NumberStyles.Any, CultureInfo.InvariantCulture, out int to))
-                throw new ConvertException(from, typeof(int));
+            int.TryParse(from, NumberStyles.Any, CultureInfo.InvariantCulture, out int to);
+            
             return (to);
         }
     }

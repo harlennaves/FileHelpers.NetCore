@@ -8,8 +8,7 @@ namespace FileHelpers.Core.Converters
     {
         public override object StringToField(string @from)
         {
-            if (!ulong.TryParse(from, NumberStyles.Any, CultureInfo.InvariantCulture, out ulong to))
-                throw new ConvertException(from, typeof(long));
+            ulong.TryParse(from, NumberStyles.Any, CultureInfo.InvariantCulture, out ulong to);
             return (to);
         }
     }

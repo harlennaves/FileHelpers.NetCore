@@ -473,5 +473,28 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
 
             Assert.AreEqual("0010025STOCKASC00STOCKASC01STOCKASC02STOCKASC03STOCKASC04STOCKASC05STOCKASC06STOCKASC07STOCKASC08STOCKASC09STOCKASC10STOCKASC11STOCKASC12STOCKASC13STOCKASC14STOCKASC15STOCKASC16STOCKASC17STOCKASC18STOCKASC19STOCKASC20STOCKASC21STOCKASC22STOCKASC23STOCKASC24" + Environment.NewLine, content);
         }
+
+        [TestMethod]
+        public void Read_With_NullValue()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(50)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Doc")
+                      .SetLength(14)
+                      .SetAlignMode(AlignMode.Left)
+                      .SetConverter(typeof(LongConverter))
+                      .SetNullValue("05870659663")
+                      .SetAlignChar('0');
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Harlen Naves                                                    ");
+
+
+        }
     }
 }

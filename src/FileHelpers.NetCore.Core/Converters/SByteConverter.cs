@@ -10,8 +10,7 @@ namespace FileHelpers.Core.Converters
         {
             if (string.IsNullOrWhiteSpace(from))
                 return null;
-            if (!sbyte.TryParse(from.RemoveBlanks(), NumberStyles.Number, CultureInfo.InvariantCulture, out sbyte res))
-                throw new ConvertException(from, typeof(sbyte));
+            sbyte.TryParse(from.RemoveBlanks(), NumberStyles.Number, CultureInfo.InvariantCulture, out sbyte res);
             return res;
         }
     }

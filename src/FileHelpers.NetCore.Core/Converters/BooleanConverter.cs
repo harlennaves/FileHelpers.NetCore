@@ -17,6 +17,9 @@
                 case "y":
                 case "t":
                 case "s":
+                case "yes":
+                case "sim":
+                case "si":
                     return true;
                 default:
                     return false;
