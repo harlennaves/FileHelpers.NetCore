@@ -496,5 +496,139 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
 
 
         }
+
+        [TestMethod]
+        public void Read_With_Decimal_Positive()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(18)
+                .SetConverter(typeof(DecimalConverter))
+                .SetConverterFormat("0.00");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var itens = engine.ReadString("Product 1 000000000000000129");
+        }
+
+        [TestMethod]
+        public void Read_With_Decimal_Positive_N_Format()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(18)
+                .SetConverter(typeof(DecimalConverter))
+                .SetConverterFormat("N2");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 000000000000000129");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(1.29M, item.Price);
+        }
+
+        [TestMethod]
+        public void Read_With_Decimal_Positive_N_3_Format()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(18)
+                .SetConverter(typeof(DecimalConverter))
+                .SetConverterFormat("N3");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 000000000000000129");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(0.129M, item.Price);
+        }
+
+        [TestMethod]
+        public void Read_With_Decimal_Negative()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(18)
+                .SetConverter(Type.GetType("FileHelpers.Core.Converters.DecimalConverter, FileHelpers.Fluent", false))
+                .SetConverterFormat("0.00");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 -00000000000000129");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(-1.29M, item.Price);
+        }
+
+        [TestMethod]
+        public void Read_With_Float_Negative()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(12)
+                .SetConverter(typeof(FloatConverter))
+                .SetConverterFormat("0.00");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 -00000000129");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(-1.29F, item.Price);
+        }
+
+        [TestMethod]
+        public void Read_With_Double_Negative_LessChars()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(12)
+                .SetConverter(typeof(DoubleConverter))
+                .SetConverterFormat("0.00");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 -129");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(1.29, item.Price);
+        }
     }
 }

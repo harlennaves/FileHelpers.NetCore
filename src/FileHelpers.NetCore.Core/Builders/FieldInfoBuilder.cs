@@ -29,11 +29,22 @@ namespace FileHelpers.Fluent.Builders
         {
             if (converter == null)
                 throw new ArgumentNullException(nameof(converter));
-            if (converter.BaseType != typeof(ConverterBase))
+            if (!IsConverterBase(converter.BaseType))
                 throw new BadFluentConfigurationException("The converter type must inherit from ConverterBase");
 
             Converter = converter;
             return this;
+        }
+
+        private bool IsConverterBase(Type type)
+        {
+            if (type == typeof(ConverterBase))
+                return true;
+
+            if (type.BaseType != null)
+                return IsConverterBase(type.BaseType);
+
+            return false;
         }
 
         public FieldInfoBuilder SetNullValue(object nullValue)
