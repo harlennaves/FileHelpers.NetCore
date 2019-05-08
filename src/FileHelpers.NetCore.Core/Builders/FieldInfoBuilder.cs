@@ -6,9 +6,9 @@ using FileHelpers.Fluent.Exceptions;
 
 namespace FileHelpers.Fluent.Builders
 {
-    public abstract class FieldInfoBuilder : IFieldInfoDescriptor
+    public class FieldInfoBuilder : IFieldInfoDescriptor
     {
-        protected FieldInfoBuilder()
+        public FieldInfoBuilder()
         {
             IsArray = false;
             AlignChar = ' ';

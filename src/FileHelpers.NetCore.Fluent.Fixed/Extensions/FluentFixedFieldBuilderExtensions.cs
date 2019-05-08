@@ -28,14 +28,16 @@ namespace FileHelpers.Fluent.Fixed.Extensions
 
             var stringValue = line.Substring(offset, length);
             offset += length;
+
+            string stringNullRepresentation = new string('\u0000', length);
             
-            if (stringValue == null && recordInfo.NullValue == null)
+            if ((stringValue == null || stringValue == stringNullRepresentation) && recordInfo.NullValue == null)
                 return null;
-            else if (stringValue == null && recordInfo.NullValue != null)
+            else if ((stringValue == null || stringValue == stringNullRepresentation) && recordInfo.NullValue != null)
                 stringValue = recordInfo.NullValue.ToString();
 
             stringValue = recordInfo.StringTrim(stringValue);
-            ConverterBase converterInstance = null;
+            ConverterBase converterInstance;
             if (string.Empty.Equals(stringValue) && recordInfo.Converter == null)
             {
                 if (recordInfo.NullValue != null)

@@ -37,6 +37,10 @@ namespace FileHelpers.Core.Engines
 
         protected abstract Task<ExpandoObject> ReadLineAsync(string currentLine, IRecordDescriptor descriptor);
 
+        public abstract ExpandoObject[] ReadBuffer(byte[] buffer);
+
+        public abstract Task<ExpandoObject[]> ReadBufferAsync(byte[] buffer);
+
         /// <summary>
         /// Called in read operations just before the record string is
         /// translated to a record.

@@ -27,5 +27,6 @@ namespace FileHelpers.Core.Descriptors
         public int ArrayItemLength { get; set; }
         public bool Align { get; set; }
         public char AlignChar { get; set; }
+        public char NullChar { get; set; }
     }
 }

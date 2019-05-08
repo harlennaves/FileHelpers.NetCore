@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>0.1.0</Version>
+    <PackageReleaseNotes>Read delimited files</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FileHelpers.NetCore.Core\FileHelpers.Fluent.csproj" />
+  </ItemGroup>
+
+</Project>

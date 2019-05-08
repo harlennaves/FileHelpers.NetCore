@@ -72,7 +72,7 @@ namespace FileHelpers.Fluent.Fixed.Extensions
                         {
                             item.TryAdd(fluentFixedRecordInfoBase.Key,
                                 ((IArrayFieldInfoDescriptor)fluentFixedRecordInfoBase.Value).StringToArray(arrayItemString,
-                                    ref offset));
+                                    ref itemOffset));
                             continue;
                         }
 

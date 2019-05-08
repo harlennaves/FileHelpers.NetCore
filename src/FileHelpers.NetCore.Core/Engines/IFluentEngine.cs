@@ -21,6 +21,10 @@ namespace FileHelpers.Core.Engines
 
         Task<ExpandoObject[]> ReadStreamAsync(StreamReader reader);
 
+        ExpandoObject[] ReadBuffer(byte[] buffer);
+
+        Task<ExpandoObject[]> ReadBufferAsync(byte[] buffer);
+
         /// <summary>
         /// Called in read operations just before the record string is
         /// translated to a record.

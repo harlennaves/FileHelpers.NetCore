@@ -18,6 +18,7 @@ namespace FileHelpers.Fluent.Xml.Builders
         public string PropertyName { get; set; }
 
         public string ElementName { get; set; }
+        public char NullChar { get; set; }
 
         public void Add(string fieldName, IFieldInfoTypeDescriptor fieldDescriptor)
         {

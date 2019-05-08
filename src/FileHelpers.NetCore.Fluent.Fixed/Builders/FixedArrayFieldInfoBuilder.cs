@@ -29,6 +29,7 @@ namespace FileHelpers.Fluent.Fixed.Builders
         public int ArrayItemLength { get; set; }
         public bool Align { get; set; }
         public char AlignChar { get; set; }
+        public char NullChar { get; set; }
 
         public FixedArrayFieldInfoBuilder SetArrayLength(int arrayLength)
         {

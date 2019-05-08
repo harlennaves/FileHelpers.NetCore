@@ -214,6 +214,16 @@ namespace FileHelpers.Fluent.Fixed
             return items.ToArray();
         }
 
+        public override ExpandoObject[] ReadBuffer(byte[] buffer) =>
+            ReadBufferAsync(buffer).GetAwaiter().GetResult();
+
+        public override Task<ExpandoObject[]> ReadBufferAsync(byte[] buffer)
+        {
+            using (var stream = new MemoryStream(buffer))
+                using (var streamReader = new StreamReader(stream, Encoding))
+                    return ReadStreamAsync(streamReader);
+        }
+
         public override string Serialize() =>
             JsonFixedRecordDescriptorBuilder.Serialize((FixedRecordDescriptor)Descriptor);
     }

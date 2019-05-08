@@ -27,6 +27,16 @@ namespace FileHelpers.Fluent.Fixed.Extensions
             return fieldInfo;
         }
 
+        public static FixedArrayFieldInfoBuilder AddSubArray(this IRecordDescriptor recordInfo, string fieldName)
+        {
+            if (string.IsNullOrWhiteSpace(fieldName))
+                throw new BadFluentConfigurationException($"The {nameof(fieldName)} cannot be null or empty");
+
+            var fieldInfo = new FixedArrayFieldInfoBuilder();
+            recordInfo.Add(fieldName, fieldInfo);
+            return fieldInfo;
+        }
+
         public static FixedArrayFieldInfoBuilder AddArray(this IFieldInfoTypeDescriptor fieldInfo, string fieldName)
         {
             if (!fieldInfo.IsArray)

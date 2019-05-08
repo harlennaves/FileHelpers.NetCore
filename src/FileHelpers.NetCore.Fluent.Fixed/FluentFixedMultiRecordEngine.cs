@@ -172,6 +172,16 @@ namespace FileHelpers.Fluent.Fixed
             }
         }
 
+        public override ExpandoObject[] ReadBuffer(byte[] buffer) =>
+            ReadBufferAsync(buffer).GetAwaiter().GetResult();
+
+        public override Task<ExpandoObject[]> ReadBufferAsync(byte[] buffer)
+        {
+            using (var stream = new MemoryStream(buffer))
+            using (var streamReader = new StreamReader(stream, Encoding))
+                return ReadStreamAsync(streamReader);
+        }
+
         public  override ExpandoObject[] ReadStream(StreamReader reader) =>
             ReadStreamAsync(reader).GetAwaiter().GetResult();
 

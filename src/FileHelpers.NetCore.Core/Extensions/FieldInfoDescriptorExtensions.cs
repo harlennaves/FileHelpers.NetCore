@@ -1,5 +1,6 @@
 ﻿using FileHelpers.Core.Converters;
 using FileHelpers.Core.Descriptors;
+using System.Text;
 
 namespace FileHelpers.Fluent.Extensions
 {
