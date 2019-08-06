@@ -7,7 +7,7 @@
     <Company>Harlen Naves</Company>
     <Description>Fluent XML Layout</Description>
     <PackageProjectUrl>https://github.com/harlennaves/FileHelpers.NetCore</PackageProjectUrl>
-    <Version>1.0.0.2</Version>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

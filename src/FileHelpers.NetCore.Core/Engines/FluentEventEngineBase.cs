@@ -17,9 +17,9 @@ namespace FileHelpers.Core.Engines
 
         public abstract string WriteString(IEnumerable<ExpandoObject> records);
 
-        public abstract void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records);
+        public abstract void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true);
 
-        public abstract Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records);
+        public abstract Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true);
 
         public abstract void WriteFile(string fileName, IEnumerable<ExpandoObject> records);
 

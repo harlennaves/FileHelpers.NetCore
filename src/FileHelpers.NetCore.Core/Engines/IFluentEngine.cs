@@ -11,9 +11,9 @@ namespace FileHelpers.Core.Engines
     {
         string WriteString(IEnumerable<ExpandoObject> records);
 
-        void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records);
+        void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true);
 
-        Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records);
+        Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true);
 
         ExpandoObject[] ReadString(string source);
 

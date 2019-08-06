@@ -80,10 +80,10 @@ namespace FileHelpers.Fluent.Fixed
             }
         }
 
-        public override void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records) =>
-            WriteStreamAsync(writer, records).GetAwaiter().GetResult();
+        public override void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true) =>
+            WriteStreamAsync(writer, records, flush).GetAwaiter().GetResult();
 
-        public override async Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records)
+        public override async Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true)
         {
             writer.NewLine = Environment.NewLine;
             var lineNumber = 1;
@@ -117,7 +117,9 @@ namespace FileHelpers.Fluent.Fixed
                 AfterFluentWriteEventArgs afterWriteArgs = OnAfterWriteRecord(expandoObject, lineNumber, sb.ToString());
 
                 await writer.WriteLineAsync(afterWriteArgs.Line);
-                await writer.FlushAsync();
+
+                if (flush)
+                    await writer.FlushAsync();
                 lineNumber++;
             }
         }

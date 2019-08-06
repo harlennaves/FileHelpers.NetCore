@@ -630,5 +630,176 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
             dynamic item = items[0];
             Assert.AreEqual(1.29, item.Price);
         }
+
+        [TestMethod]
+        public void Read_With_Null()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                .SetLength(5)
+                .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("MiddleName")
+                .SetLength(5);
+
+            descriptor.AddField("LastName")
+                .SetLength(5);
+
+            var engine = descriptor.Build();
+
+
+            var items = engine.ReadFile(@"C:\tmp\Message.txt");
+
+            Assert.AreEqual(1, items.Length);
+
+            dynamic item = items[0];
+
+            Assert.AreEqual(null, item.MiddleName);
+        }
+
+        [TestMethod]
+        public void Read_Multi_Array()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("MessageAction")
+                .SetLength(32)
+                .SetTrimMode(TrimMode.Right);
+
+            descriptor.AddField("NUMPARAM")
+                .SetLength(9)
+                .SetAlignMode(AlignMode.Right)
+                .SetAlignChar('0')
+                .SetType(typeof(int))
+                .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("TPCONTR")
+                .SetLength(1)
+                .SetTrimMode(TrimMode.None)
+                ;
+
+            descriptor.AddField("TPPARM")
+                .SetLength(1)
+                .SetTrimMode(TrimMode.None)
+                ;
+            descriptor.AddField("TPCHASSI")
+                .SetLength(1)
+                .SetTrimMode(TrimMode.None)
+                ;
+            descriptor.AddField("NUMCDB")
+                .SetLength(10)
+                .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("TPBONUS")
+                .SetLength(1)
+                .SetTrimMode(TrimMode.None)
+                ;
+
+            descriptor.AddField("NUMCONTRINI")
+                .SetLength(9)
+                .SetAlignMode(AlignMode.Right)
+                .SetAlignChar('0')
+                .SetType(typeof(int))
+                .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("NUMCONTRFIM")
+                .SetLength(9)
+                .SetAlignMode(AlignMode.Right)
+                .SetAlignChar('0')
+                .SetType(typeof(int))
+                .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("TXTDESCRICAO")
+                .SetLength(80)
+                .SetTrimMode(TrimMode.Right);
+
+            var accountingEventDescriptor = descriptor.AddArray("AccountingEvent")
+                .SetAlign(true)
+                .SetAlignChar(' ')
+                .SetArrayLength(5590)
+                .SetArrayItemLength(1118);
+
+            accountingEventDescriptor.AddField("NUMPARAM")
+                .SetLength(9)
+                .SetAlignMode(AlignMode.Right)
+                .SetAlignChar('0')
+                .SetType(typeof(int))
+                .SetTrimMode(TrimMode.Both);
+
+            accountingEventDescriptor.AddField("NUMEVENT")
+                .SetLength(9)
+                .SetAlignMode(AlignMode.Right)
+                .SetAlignChar('0')
+                .SetType(typeof(int))
+                .SetTrimMode(TrimMode.Both);
+
+            accountingEventDescriptor.AddField("TXTDESCRICAO")
+                .SetLength(80)
+                .SetTrimMode(TrimMode.Right);
+
+            var accountingDataDescriptor = accountingEventDescriptor.AddSubArray("AccountingData")
+                .SetAlign(true)
+                .SetAlignChar(' ')
+                .SetArrayLength(1020)
+                .SetArrayItemLength(102);
+
+            accountingDataDescriptor.AddField("NUMPARAM")
+                .SetLength(9)
+                .SetAlignMode(AlignMode.Right)
+                .SetAlignChar('0')
+                .SetType(typeof(int))
+                .SetTrimMode(TrimMode.Both);
+
+            accountingDataDescriptor.AddField("NUMEVENT")
+                .SetLength(9)
+                .SetAlignMode(AlignMode.Right)
+                .SetAlignChar('0')
+                .SetType(typeof(int))
+                .SetTrimMode(TrimMode.Both);
+
+            accountingDataDescriptor.AddField("CODTIPO")
+                .SetLength(2)
+                .SetTrimMode(TrimMode.None);
+
+            accountingDataDescriptor.AddField("NUMSEQ")
+                .SetLength(4)
+                .SetAlignMode(AlignMode.Right)
+                .SetAlignChar('0')
+                .SetType(typeof(int))
+                .SetTrimMode(TrimMode.Both);
+
+            accountingDataDescriptor.AddField("DESCCONTA")
+                .SetLength(10)
+                .SetTrimMode(TrimMode.Right);
+
+            accountingDataDescriptor.AddField("DESCCENTRO")
+                .SetLength(10)
+                .SetTrimMode(TrimMode.Right);
+
+            accountingDataDescriptor.AddField("VLRPERCEN")
+                .SetLength(5)
+                .SetAlignMode(AlignMode.Right)
+                .SetAlignChar(' ')
+                .SetConverterFormat("N2")
+                .SetConverter(typeof(DecimalConverter))
+                .SetTrimMode(TrimMode.Both);
+
+            accountingDataDescriptor.AddField("CODLCTO")
+                .SetLength(2)
+                .SetTrimMode(TrimMode.None);
+
+            accountingDataDescriptor.AddField("CODCOPA")
+                .SetLength(1)
+                .SetTrimMode(TrimMode.None);
+
+            accountingDataDescriptor.AddField("TXTDESCRICAO")
+                .SetLength(50)
+                .SetTrimMode(TrimMode.Right);
+
+            var engine = descriptor.Build();
+
+            var items = engine.ReadString("LOAD                            000000001PRC0000000000 000000000000000000SETUP PADRÃO - REGRA DEFAULT                                                    000000001000000001Evento default                                                                  000000001000000001CR0001244044    2PPM      09450  NPARCELA PM - SET UP PADRÃO                        000000001000000001CR0002244048    2PPM      00200  NPM  SET UP PADRÃO - FUNDO DE CONTINGENCIA         000000001000000001CR0003244049    2PPM      00250  NPM SET UP PADRÃO - TX ADMINISTRATIVA              000000001000000001CR0004244050    2PPM      00100  NPM SET UP PADRÃO - FIGHTING FUND                  000000001000000001DB0001PARMA     2PPM      10000  NPARCELA PM SET UP PADRÃO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ");
+        }
     }
 }

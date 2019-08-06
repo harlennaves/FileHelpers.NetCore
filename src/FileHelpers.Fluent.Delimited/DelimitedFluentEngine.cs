@@ -100,10 +100,10 @@ namespace FileHelpers.Fluent.Delimited
                 await WriteStreamAsync(writer, records);
         }
 
-        public override void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records) => 
-            WriteStreamAsync(writer, records).GetAwaiter().GetResult();
+        public override void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true) => 
+            WriteStreamAsync(writer, records, flush).GetAwaiter().GetResult();
 
-        public override async Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records)
+        public override async Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true)
         {
             writer.NewLine = Environment.NewLine;
             var lineNumber = 1;
@@ -127,6 +127,7 @@ namespace FileHelpers.Fluent.Delimited
 
                     if (fieldDescriptor.IsArray)
                     {
+                        sb.Append(((IDelimitedArrayFieldInfoDescriptor)fieldDescriptor).ArrayToString((IEnumerable<dynamic>)keyValuePair.Value));
                         sb.Append(delimiter);
                         continue;
                     }
@@ -135,11 +136,12 @@ namespace FileHelpers.Fluent.Delimited
                        );
                    sb.Append(delimiter);
                 }
-
+                sb.Length = sb.Length - 1;
                 AfterFluentWriteEventArgs afterWriteArgs = OnAfterWriteRecord(expandoObject, lineNumber, sb.ToString());
 
                 await writer.WriteLineAsync(afterWriteArgs.Line);
-                await writer.FlushAsync();
+                if (flush)
+                    await writer.FlushAsync();
                 lineNumber++;
             }
         }

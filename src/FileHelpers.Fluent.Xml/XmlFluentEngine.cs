@@ -127,10 +127,10 @@ namespace FileHelpers.Fluent.Xml
                 await WriteStreamAsync(writer, records);
         }
 
-        public override void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records) =>
-            WriteStreamAsync(writer, records).GetAwaiter().GetResult();
+        public override void WriteStream(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true) =>
+            WriteStreamAsync(writer, records, flush).GetAwaiter().GetResult();
 
-        public override async Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records)
+        public override async Task WriteStreamAsync(TextWriter writer, IEnumerable<ExpandoObject> records, bool flush = true)
         {
             var xmlDescriptor = ((XmlRecordDescriptor)Descriptor);
             string rootElementName = xmlDescriptor.RootElementName;
