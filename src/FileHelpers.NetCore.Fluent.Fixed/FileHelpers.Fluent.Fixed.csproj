@@ -1,13 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl>https://github.com/harlennaves/FileHelpers.NetCore</PackageProjectUrl>
     <Description>Fluent fixed layout file engine processing</Description>
-    <Version>1.4.0</Version>
+    <Version>1.5.0</Version>
     <Authors>Harlen Naves</Authors>
-    <PackageReleaseNotes>Fixed a problem with subarray objects</PackageReleaseNotes>
+    <PackageReleaseNotes>Support to fixed format
+Support to add signals on decimal converters
+Support to override boolean true and false checks</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

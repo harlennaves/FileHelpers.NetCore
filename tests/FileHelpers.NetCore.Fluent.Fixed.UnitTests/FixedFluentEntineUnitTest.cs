@@ -540,6 +540,102 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
         }
 
         [TestMethod]
+        public void Read_With_Decimal_Positive_N_Integer_Format()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(18)
+                .SetConverter(typeof(DecimalConverter))
+                .SetConverterFormat("N16.2");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 000000000000000129");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(1.29M, item.Price);
+        }
+
+        [TestMethod]
+        public void Read_With_Decimal_Positive_N_Integer_Signal_Format()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(18)
+                .SetConverter(typeof(DecimalConverter))
+                .SetConverterFormat("+N16.2");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 000000000000000129");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(1.29M, item.Price);
+        }
+
+        [TestMethod]
+        public void Write_With_Decimal_Positive_N_Integer_Signal_Format()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(18)
+                .SetConverter(typeof(DecimalConverter))
+                .SetConverterFormat("+N15.2");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 +00000000000000129");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(1.29M, item.Price);
+            var output = engine.WriteString(items).Replace("\r\n", string.Empty);
+            Assert.AreEqual("Product 1 +00000000000000129", output);
+        }
+
+        [TestMethod]
+        public void Write_With_Decimal_Positive_N_Integer_Signal_Separator_Format()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Price")
+                .SetLength(18)
+                .SetConverter(typeof(DecimalConverter))
+                .SetConverterFormat("+NS15.2");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 +00000000000001.29");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(1.29M, item.Price);
+            var output = engine.WriteString(items).Replace("\r\n", string.Empty);
+            Assert.AreEqual("Product 1 +00000000000001.29", output);
+        }
+
+        [TestMethod]
         public void Read_With_Decimal_Positive_N_3_Format()
         {
             var descriptor = new FixedRecordDescriptor();
@@ -605,7 +701,7 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
 
             Assert.AreEqual(1, items.Length);
             dynamic item = items[0];
-            Assert.AreEqual(-1.29F, item.Price);
+            Assert.AreEqual(-1.29F, (float)item.Price);
         }
 
         [TestMethod]
@@ -628,7 +724,7 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
 
             Assert.AreEqual(1, items.Length);
             dynamic item = items[0];
-            Assert.AreEqual(1.29, item.Price);
+            Assert.AreEqual(-1.29, item.Price);
         }
 
         [TestMethod]
@@ -800,6 +896,159 @@ namespace FileHelpers.NetCore.Fluent.Fixed.UnitTests
             var engine = descriptor.Build();
 
             var items = engine.ReadString("LOAD                            000000001PRC0000000000 000000000000000000SETUP PADRÃO - REGRA DEFAULT                                                    000000001000000001Evento default                                                                  000000001000000001CR0001244044    2PPM      09450  NPARCELA PM - SET UP PADRÃO                        000000001000000001CR0002244048    2PPM      00200  NPM  SET UP PADRÃO - FUNDO DE CONTINGENCIA         000000001000000001CR0003244049    2PPM      00250  NPM SET UP PADRÃO - TX ADMINISTRATIVA              000000001000000001CR0004244050    2PPM      00100  NPM SET UP PADRÃO - FIGHTING FUND                  000000001000000001DB0001PARMA     2PPM      10000  NPARCELA PM SET UP PADRÃO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ");
+        }
+
+        [TestMethod]
+        public void Read_Boolean_With_Format()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Enabled")
+                .SetLength(1)
+                .SetConverter(typeof(BooleanConverter))
+                .SetConverterFormat("1:T,0:F");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 T");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(true, item.Enabled);
+            
+        }
+
+        [TestMethod]
+        public void Read_Boolean_With_True_Format()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Enabled")
+                .SetLength(1)
+                .SetConverter(typeof(BooleanConverter))
+                .SetConverterFormat("1:T");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 T");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(true, item.Enabled);
+
+        }
+
+        [TestMethod]
+        public void Read_Boolean_With_True_Format_False_Value()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Enabled")
+                .SetLength(1)
+                .SetConverter(typeof(BooleanConverter))
+                .SetConverterFormat("1:T");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 A");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(false, item.Enabled);
+
+        }
+
+        [TestMethod]
+        public void Write_Boolean_With_Format_False()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Enabled")
+                .SetLength(1)
+                .SetConverter(typeof(BooleanConverter))
+                .SetConverterFormat("1:T,0:F");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 T");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(true, item.Enabled);
+            item.Enabled = false;
+            var output = engine.WriteString(items).Replace("\r\n", string.Empty);
+            Assert.AreEqual("Product 1 F", output);
+
+        }
+
+        [TestMethod]
+        public void Write_Boolean_With_Format_True()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Enabled")
+                .SetLength(1)
+                .SetConverter(typeof(BooleanConverter))
+                .SetConverterFormat("1:T,0:F");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 T");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(true, item.Enabled);
+            item.Enabled = false;
+            var output = engine.WriteString(items).Replace("\r\n", string.Empty);
+            Assert.AreEqual("Product 1 T", output);
+
+        }
+
+        [TestMethod]
+        public void Write_Boolean_With_Format_True_Diff_Value()
+        {
+            var descriptor = new FixedRecordDescriptor();
+
+            descriptor.AddField("Name")
+                      .SetLength(10)
+                      .SetTrimMode(TrimMode.Both);
+
+            descriptor.AddField("Enabled")
+                .SetLength(1)
+                .SetConverter(typeof(BooleanConverter))
+                .SetConverterFormat("1:V,0:F");
+
+            var engine = new FluentFixedEngine(descriptor);
+
+            var items = engine.ReadString("Product 1 V");
+
+            Assert.AreEqual(1, items.Length);
+            dynamic item = items[0];
+            Assert.AreEqual(true, item.Enabled);
+            
+            var output = engine.WriteString(items).Replace("\r\n", string.Empty);
+            Assert.AreEqual("Product 1 V", output);
+
         }
     }
 }

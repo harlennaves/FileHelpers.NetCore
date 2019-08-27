@@ -1,9 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <Version>0.2.0</Version>
-    <PackageReleaseNotes>Read delimited files</PackageReleaseNotes>
+    <Version>0.3.0</Version>
+    <PackageReleaseNotes>Support to fixed format
+Support to add signals on decimal converters
+Support to override boolean true and false checks</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

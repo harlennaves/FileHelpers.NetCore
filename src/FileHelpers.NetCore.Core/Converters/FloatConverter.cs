@@ -30,6 +30,9 @@ namespace FileHelpers.Core.Converters
                     CultureInfo.InvariantCulture,
                     out to);
 
+            if (!string.IsNullOrWhiteSpace(DecimalSeparator))
+                return to;
+
             if (
                 !float.TryParse(from.Trim(),
                     NumberStyles.Number | NumberStyles.AllowExponent,
